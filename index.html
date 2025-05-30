@@ -1,0 +1,1244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog Automation Tool</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@300;400;600;700&family=Moul&family=Moulpali&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/15559/15559222.png">
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3f37c9;
+            --accent-color: #4cc9f0;
+            --light-color: #f8f9fa;
+            --dark-color: #212529;
+            --success-color: #4bb543;
+            --header-font: 'Moul', cursive;
+            --model-font: 'Moulpali', cursive;
+            --body-font: 'Kantumruy Pro', sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--body-font);
+            line-height: 1.6;
+            color: var(--dark-color);
+            background-color: #f5f7ff;
+            overflow-x: hidden;
+        }
+
+        /* Language Toggle */
+        .language-toggle {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            background: white;
+            padding: 5px 10px;
+            border-radius: 30px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            border: 1px solid #eee;
+        }
+
+        .language-toggle span {
+            font-size: 14px;
+            margin: 0 5px;
+            font-weight: 600;
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 24px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: var(--primary-color);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
+        /* Back to Top Button */
+        .back-to-top {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            z-index: 1000;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .back-to-top.visible {
+            opacity: 1;
+        }
+
+        .back-to-top:hover {
+            background-color: var(--secondary-color);
+            transform: translateY(-3px);
+        }
+
+        /* Header Styles */
+        header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 1rem 0;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            color: white;
+            font-weight: 700;
+            font-size: 1.5rem;
+        }
+
+        .logo img {
+            height: 40px;
+            margin-right: 10px;
+        }
+
+        .logo-text {
+            font-family: var(--header-font);
+            font-size: 1.8rem;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+        }
+
+        nav ul li {
+            margin-left: 2rem;
+        }
+
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s;
+            position: relative;
+        }
+
+        nav ul li a:hover {
+            color: var(--accent-color);
+        }
+
+        nav ul li a:after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            background: var(--accent-color);
+            bottom: -5px;
+            left: 0;
+            transition: width 0.3s;
+        }
+
+        nav ul li a:hover:after {
+            width: 100%;
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 180px 0 100px;
+            background: linear-gradient(135deg, rgba(67, 97, 238, 0.1), rgba(76, 201, 240, 0.1));
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('https://images.unsplash.com/photo-1499750310107-5fef28a66643?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80') no-repeat center center/cover;
+            opacity: 0.1;
+            z-index: -1;
+        }
+
+        .hero-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+
+        .hero-text {
+            flex: 1;
+            min-width: 300px;
+            padding-right: 2rem;
+            animation: fadeInUp 1s ease;
+        }
+
+        .hero-image {
+            flex: 1;
+            min-width: 300px;
+            text-align: center;
+            animation: fadeIn 1.5s ease;
+        }
+
+        .hero-image img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+            transform: perspective(1000px) rotateY(-10deg);
+            transition: transform 0.5s ease;
+        }
+
+        .hero-image img:hover {
+            transform: perspective(1000px) rotateY(0deg);
+        }
+
+        h1 {
+            font-family: var(--header-font);
+            font-size: 3.5rem;
+            margin-bottom: 1.5rem;
+            line-height: 1.2;
+            color: var(--dark-color);
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            max-width: 600px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 30px;
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(67, 97, 238, 0.3);
+        }
+
+        .btn:hover {
+            background-color: var(--secondary-color);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(67, 97, 238, 0.4);
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+            margin-left: 15px;
+            box-shadow: none;
+        }
+
+        .btn-outline:hover {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        /* Features Section */
+        .features {
+            padding: 100px 0;
+            background-color: white;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .section-title h2 {
+            font-family: var(--header-font);
+            font-size: 2.5rem;
+            color: var(--dark-color);
+            margin-bottom: 1rem;
+        }
+
+        .section-title p {
+            max-width: 700px;
+            margin: 0 auto;
+            font-size: 1.1rem;
+            color: #666;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .feature-card {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            text-align: center;
+            border: 1px solid #eee;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+            border-color: var(--accent-color);
+        }
+
+        .feature-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, rgba(67, 97, 238, 0.1), rgba(76, 201, 240, 0.1));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            color: var(--primary-color);
+            font-size: 2rem;
+        }
+
+        .feature-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: var(--dark-color);
+        }
+
+        /* How It Works Section */
+        .how-it-works {
+            padding: 100px 0;
+            background-color: #f9fafd;
+        }
+
+        .steps {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 30px;
+            position: relative;
+        }
+
+        .step {
+            flex: 1;
+            min-width: 250px;
+            max-width: 350px;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            position: relative;
+            z-index: 1;
+            transition: all 0.3s ease;
+        }
+
+        .step:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .step-number {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .step h3 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: var(--dark-color);
+        }
+
+        .connector-line {
+            position: absolute;
+            top: 25px;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+            z-index: 0;
+        }
+
+        /* Testimonials Section */
+        .testimonials {
+            padding: 100px 0;
+            background-color: white;
+        }
+
+        .testimonials-slider {
+            max-width: 1000px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .testimonial-card {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            margin: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+            border: 1px solid #eee;
+        }
+
+        .testimonial-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+            border-color: var(--accent-color);
+        }
+
+        .testimonial-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin: 0 auto 20px;
+            border: 3px solid var(--accent-color);
+        }
+
+        .testimonial-quote {
+            font-size: 1.1rem;
+            font-style: italic;
+            color: #555;
+            margin-bottom: 20px;
+        }
+
+        .testimonial-author {
+            font-weight: 700;
+            color: var(--dark-color);
+        }
+
+        .testimonial-role {
+            color: #777;
+            font-size: 0.9rem;
+        }
+
+        /* Pricing Section */
+        .pricing {
+            padding: 100px 0;
+            background-color: #f9fafd;
+        }
+
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .pricing-card {
+            background: white;
+            border-radius: 10px;
+            padding: 40px 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid #eee;
+        }
+
+        .pricing-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .pricing-card.popular {
+            border: 2px solid var(--primary-color);
+        }
+
+        .popular-badge {
+            position: absolute;
+            top: 0;
+            right: 30px;
+            background: var(--primary-color);
+            color: white;
+            padding: 5px 15px;
+            border-bottom-left-radius: 5px;
+            border-bottom-right-radius: 5px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .pricing-card h3 {
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+            color: var(--dark-color);
+        }
+
+        .price {
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+        }
+
+        .price span {
+            font-size: 1rem;
+            color: #777;
+        }
+
+        .pricing-features {
+            list-style: none;
+            margin-bottom: 30px;
+        }
+
+        .pricing-features li {
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .pricing-features li:last-child {
+            border-bottom: none;
+        }
+
+        /* CTA Section */
+        .cta {
+            padding: 100px 0;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            text-align: center;
+        }
+
+        .cta h2 {
+            font-family: var(--header-font);
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .cta p {
+            max-width: 700px;
+            margin: 0 auto 2rem;
+            font-size: 1.2rem;
+        }
+
+        .cta .btn {
+            background-color: white;
+            color: var(--primary-color);
+            font-size: 1.1rem;
+            padding: 15px 40px;
+        }
+
+        .cta .btn:hover {
+            background-color: var(--light-color);
+            color: var(--secondary-color);
+        }
+
+        /* Footer */
+        footer {
+            background-color: var(--dark-color);
+            color: white;
+            padding: 60px 0 20px;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .footer-logo {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .footer-logo img {
+            height: 40px;
+            margin-right: 10px;
+        }
+
+        .footer-logo-text {
+            font-family: var(--header-font);
+            font-size: 1.5rem;
+        }
+
+        .footer-about p {
+            margin-bottom: 20px;
+            color: #bbb;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 15px;
+        }
+
+        .social-links a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            color: white;
+            transition: all 0.3s ease;
+        }
+
+        .social-links a:hover {
+            background: var(--primary-color);
+            transform: translateY(-3px);
+        }
+
+        .footer-links h3 {
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            position: relative;
+            padding-bottom: 10px;
+        }
+
+        .footer-links h3::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 40px;
+            height: 2px;
+            background: var(--primary-color);
+        }
+
+        .footer-links ul {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 10px;
+        }
+
+        .footer-links a {
+            color: #bbb;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: var(--accent-color);
+        }
+
+        .footer-contact p {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            color: #bbb;
+        }
+
+        .footer-contact i {
+            margin-right: 10px;
+            color: var(--accent-color);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.9rem;
+            color: #bbb;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+
+        .floating {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 992px) {
+            h1 {
+                font-size: 2.8rem;
+            }
+
+            .hero-content {
+                flex-direction: column;
+            }
+
+            .hero-text {
+                padding-right: 0;
+                margin-bottom: 50px;
+                text-align: center;
+            }
+
+            .hero-text .btn {
+                margin-bottom: 15px;
+            }
+
+            .connector-line {
+                display: none;
+            }
+
+            .steps {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .step {
+                max-width: 100%;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            nav {
+                position: fixed;
+                top: 80px;
+                left: 0;
+                width: 100%;
+                background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+                padding: 20px 0;
+                box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+                transform: translateY(-150%);
+                transition: transform 0.3s ease;
+                z-index: 99;
+            }
+
+            nav.active {
+                transform: translateY(0);
+            }
+
+            nav ul {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            nav ul li {
+                margin: 15px 0;
+            }
+
+            h1 {
+                font-size: 2.2rem;
+            }
+
+            .section-title h2 {
+                font-size: 2rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .btn {
+                display: block;
+                width: 100%;
+                margin-bottom: 15px;
+            }
+
+            .btn-outline {
+                margin-left: 0;
+            }
+
+            .hero {
+                padding: 150px 0 80px;
+            }
+
+            .features, .how-it-works, .testimonials, .pricing, .cta {
+                padding: 80px 0;
+            }
+        }
+
+        /* Khmer Language Styles */
+        body.khmer {
+            font-family: 'Kantumruy Pro', sans-serif;
+        }
+
+        body.khmer h1,
+        body.khmer h2,
+        body.khmer h3,
+        body.khmer .header-font {
+            font-family: 'Moul', serif;
+        }
+
+        body.khmer .model-font {
+            font-family: 'Moulpali', serif;
+        }
+    </style>
+</head>
+<body class="english">
+    <!-- Language Toggle -->
+    <div class="language-toggle">
+        <span class="en">EN</span>
+        <label class="toggle-switch">
+            <input type="checkbox" id="language-toggle">
+            <span class="slider"></span>
+        </label>
+        <span class="kh">KH</span>
+    </div>
+
+    <!-- Back to Top Button -->
+    <div class="back-to-top" id="back-to-top">
+        <i class="fas fa-arrow-up"></i>
+    </div>
+
+    <!-- Header -->
+    <header>
+        <div class="container header-container">
+            <a href="#" class="logo">
+                <img src="https://cdn-icons-png.flaticon.com/512/15559/15559222.png" alt="Blog Automation Logo">
+                <span class="logo-text">BlogAuto</span>
+            </a>
+            
+            <button class="mobile-menu-btn" id="mobile-menu-btn">
+                <i class="fas fa-bars"></i>
+            </button>
+            
+            <nav id="main-nav">
+                <ul>
+                    <li><a href="#features" class="nav-link" data-en="Features" data-kh="លក្ខណៈពិសេស">Features</a></li>
+                    <li><a href="#how-it-works" class="nav-link" data-en="How It Works" data-kh="របៀបដំណើរការ">How It Works</a></li>
+                    <li><a href="#testimonials" class="nav-link" data-en="Testimonials" data-kh="សាកល្បង">Testimonials</a></li>
+                    <li><a href="#pricing" class="nav-link" data-en="Pricing" data-kh="តម្លៃ">Pricing</a></li>
+                    <li><a href="#contact" class="nav-link" data-en="Contact" data-kh="ទំនាក់ទំនង">Contact</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <div class="hero-text">
+                    <h1 data-en="Automate Your Blogging Workflow" data-kh="ស្វ័យប្រវត្តិកម្មលំហូរការងារប្លុករបស់អ្នក">Automate Your Blogging Workflow</h1>
+                    <p data-en="Our powerful tool helps you create, schedule, and publish blog posts automatically, saving you hours of manual work." data-kh="ឧបករណ៍ដ៏មានឥទ្ធិពលរបស់យើងជួយអ្នកបង្កើត កំណត់ពេលវេលា និងបោះពុម្ពអត្ថបទប្លុកដោយស្វ័យប្រវត្តិ ដែលជួយអ្នកសន្សំម៉ោងការងារដោយដៃជាច្រើន។">Our powerful tool helps you create, schedule, and publish blog posts automatically, saving you hours of manual work.</p>
+                    <div>
+                        <a href="#pricing" class="btn" data-en="Get Started" data-kh="ចាប់ផ្តើម">Get Started</a>
+                        <a href="#how-it-works" class="btn btn-outline" data-en="Learn More" data-kh="រៀនបន្ថែម">Learn More</a>
+                    </div>
+                </div>
+                <div class="hero-image">
+                    <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" alt="Blog Automation Dashboard" class="floating">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features" id="features">
+        <div class="container">
+            <div class="section-title">
+                <h2 data-en="Powerful Features" data-kh="លក្ខណៈពិសេសដ៏មានឥទ្ធិពល">Powerful Features</h2>
+                <p data-en="Everything you need to automate your blogging process and grow your audience" data-kh="អ្វីៗដែលអ្នកត្រូវការដើម្បីស្វ័យប្រវត្តិកម្មដំណើរការប្លុក និងពង្រីកទស្សនិកជនរបស់អ្នក">Everything you need to automate your blogging process and grow your audience</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <h3 data-en="AI Content Generation" data-kh="ការបង្កើតមាតិកា AI">AI Content Generation</h3>
+                    <p data-en="Generate high-quality blog posts with our advanced AI technology in minutes." data-kh="បង្កើតអត្ថបទប្លុកដែលមានគុណភាពខ្ពស់ជាមួយនឹងបច្ចេកវិទ្យា AI កម្រិតខ្ពស់របស់យើងក្នុងរយៈពេលតែប៉ុន្មាននាទី។">Generate high-quality blog posts with our advanced AI technology in minutes.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-calendar-alt"></i>
+                    </div>
+                    <h3 data-en="Smart Scheduling" data-kh="ការកំណត់ពេលវេលាឆ្លាត">Smart Scheduling</h3>
+                    <p data-en="Schedule posts in advance and publish them at optimal times for maximum engagement." data-kh="កំណត់ពេលវេលាសម្រាប់ប្រកាសជាមុន និងបោះពុម្ពវានៅពេលដ៏ល្អបំផុតសម្រាប់ការចូលរួមអតិបរមា។">Schedule posts in advance and publish them at optimal times for maximum engagement.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h3 data-en="Performance Analytics" data-kh="ការវិភាគប្រសិទ្ធភាព">Performance Analytics</h3>
+                    <p data-en="Track your blog's performance with detailed analytics and insights to improve your strategy." data-kh="តាមដានប្រសិទ្ធភាពប្លុករបស់អ្នកជាមួយនឹងការវិភាគ និងការយល់ដឹងលម្អិតដើម្បីកែលម្អយុទ្ធសាស្ត្ររបស់អ្នក។">Track your blog's performance with detailed analytics and insights to improve your strategy.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-image"></i>
+                    </div>
+                    <h3 data-en="Automatic Images" data-kh="រូបភាពស្វ័យប្រវត្តិ">Automatic Images</h3>
+                    <p data-en="Our system automatically finds and adds relevant images to your blog posts." data-kh="ប្រព័ន្ធរបស់យើងស្វ័យប្រវត្តិរក និងបន្ថែមរូបភាពពាក់ព័ន្ធទៅនឹងអត្ថបទប្លុករបស់អ្នក។">Our system automatically finds and adds relevant images to your blog posts.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-globe"></i>
+                    </div>
+                    <h3 data-en="Multi-language Support" data-kh="ការគាំទ្រពហុភាសា">Multi-language Support</h3>
+                    <p data-en="Create content in multiple languages to reach a global audience with ease." data-kh="បង្កើតមាតិកាជាច្រើនភាសាដើម្បីឈានដល់ទស្សនិកជនសកលដោយងាយស្រួល។">Create content in multiple languages to reach a global audience with ease.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-share-alt"></i>
+                    </div>
+                    <h3 data-en="Social Media Integration" data-kh="ការរួមបញ្ចូលប្រព័ន្ធផ្សព្វផ្សាយសង្គម">Social Media Integration</h3>
+                    <p data-en="Automatically share your new posts across all your social media platforms." data-kh="ចែករំលែកអត្ថបទថ្មីៗរបស់អ្នកដោយស្វ័យប្រវត្តិនៅទូទាំងវេទិកាប្រព័ន្ធផ្សព្វផ្សាយសង្គមរបស់អ្នក។">Automatically share your new posts across all your social media platforms.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section class="how-it-works" id="how-it-works">
+        <div class="container">
+            <div class="section-title">
+                <h2 data-en="How It Works" data-kh="របៀបដំណើរការ">How It Works</h2>
+                <p data-en="Get started in just a few simple steps" data-kh="ចាប់ផ្តើមក្នុងជំហានសាមញ្ញតែប៉ុន្មាន">Get started in just a few simple steps</p>
+            </div>
+            <div class="steps">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <h3 data-en="Connect Your Blog" data-kh="ភ្ជាប់ប្លុករបស់អ្នក">Connect Your Blog</h3>
+                    <p data-en="Connect your WordPress, Medium, or custom blog platform to our system with just a few clicks." data-kh="ភ្ជាប់ WordPress, Medium ឬវេទិកាប្លុកផ្ទាល់ខ្លួនរបស់អ្នកទៅប្រព័ន្ធរបស់យើងដោយគ្រាន់តែចុចពីរបីដង។">Connect your WordPress, Medium, or custom blog platform to our system with just a few clicks.</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <h3 data-en="Set Your Preferences" data-kh="កំណត់ចំណូលចិត្តរបស់អ្នក">Set Your Preferences</h3>
+                    <p data-en="Tell us about your niche, writing style, and posting frequency preferences." data-kh="ប្រាប់យើងអំពីហាងឆេង ស្ទីលសរសេរ និងចំណូលចិត្តភាពញឹកញាប់នៃការប្រកាសរបស់អ្នក។">Tell us about your niche, writing style, and posting frequency preferences.</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <h3 data-en="Let Us Handle the Rest" data-kh="អនុញ្ញាតឱ្យយើងដោះស្រាយផ្នែកដែលនៅសល់">Let Us Handle the Rest</h3>
+                    <p data-en="Our AI will create, optimize, and publish high-quality content automatically for you." data-kh="AI របស់យើងនឹងបង្កើត ធ្វើឱ្យប្រសើរ និងបោះពុម្ពមាតិកាដែលមានគុណភាពខ្ពស់ដោយស្វ័យប្រវត្តិសម្រាប់អ្នក។">Our AI will create, optimize, and publish high-quality content automatically for you.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section class="testimonials" id="testimonials">
+        <div class="container">
+            <div class="section-title">
+                <h2 data-en="What Our Users Say" data-kh="អ្វីដែលអ្នកប្រើប្រាស់របស់យើងនិយាយ">What Our Users Say</h2>
+                <p data-en="Don't just take our word for it. Here's what our users have to say about BlogAuto." data-kh="កុំគ្រាន់តែយកពាក្យរបស់យើង។ នេះគឺជាអ្វីដែលអ្នកប្រើប្រាស់របស់យើងនិយាយអំពី BlogAuto។">Don't just take our word for it. Here's what our users have to say about BlogAuto.</p>
+            </div>
+            <div class="testimonials-slider">
+                <div class="testimonial-card">
+                    <img src="https://randomuser.me/api/portraits/women/32.jpg" alt="Sarah Johnson" class="testimonial-avatar">
+                    <p class="testimonial-quote" data-en="BlogAuto has completely transformed my content creation process. I went from spending hours writing to having quality posts published automatically." data-kh="BlogAuto បានផ្លាស់ប្តូរដំណើរការបង្កើតមាតិការបស់ខ្ញុំទាំងស្រុង។ ខ្ញុំបានចំណាយពេលម៉ោងជាច្រើនក្នុងការសរសេរដើម្បីឱ្យមានការប្រកាសដែលមានគុណភាពត្រូវបានបោះពុម្ពដោយស្វ័យប្រវត្តិ។">BlogAuto has completely transformed my content creation process. I went from spending hours writing to having quality posts published automatically.</p>
+                    <div class="testimonial-author">Sarah Johnson</div>
+                    <div class="testimonial-role" data-en="Tech Blogger" data-kh="អ្នកសរសេរប្លុកបច្ចេកវិទ្យា">Tech Blogger</div>
+                </div>
+                <div class="testimonial-card">
+                    <img src="https://randomuser.me/api/portraits/men/45.jpg" alt="David Kim" class="testimonial-avatar">
+                    <p class="testimonial-quote" data-en="The AI content is surprisingly good. My readers can't tell the difference between my writing and the automated posts!" data-kh="មាតិកា AI គឺល្អយ៉ាងគួរឱ្យភ្ញាក់ផ្អើល។ អ្នកអានរបស់ខ្ញុំមិនអាចបែងចែកភាពខុសគ្នារវាងការសរសេររបស់ខ្ញុំ និងការប្រកាសដោយស្វ័យប្រវត្តិបានទេ!">The AI content is surprisingly good. My readers can't tell the difference between my writing and the automated posts!</p>
+                    <div class="testimonial-author">David Kim</div>
+                    <div class="testimonial-role" data-en="Marketing Consultant" data-kh="អ្នកប្រឹក្សាផ្នែកទីផ្សារ">Marketing Consultant</div>
+                </div>
+                <div class="testimonial-card">
+                    <img src="https://randomuser.me/api/portraits/women/68.jpg" alt="Maria Garcia" class="testimonial-avatar">
+                    <p class="testimonial-quote" data-en="I've doubled my blog traffic since using BlogAuto. The scheduling feature alone is worth the price." data-kh="ខ្ញុំបានកើនចរាចរណ៍ប្លុករបស់ខ្ញុំឡើងពីរដងចាប់តាំងពីប្រើ BlogAuto។ លក្ខណៈពិសេសនៃការកំណត់ពេលវេលាតែម្នាក់ឯងក៏គួរឱ្យគិតថាមានតម្លៃដែរ។">I've doubled my blog traffic since using BlogAuto. The scheduling feature alone is worth the price.</p>
+                    <div class="testimonial-author">Maria Garcia</div>
+                    <div class="testimonial-role" data-en="Travel Blogger" data-kh="អ្នកសរសេរប្លុកអំពីការធ្វើដំណើរ">Travel Blogger</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section class="pricing" id="pricing">
+        <div class="container">
+            <div class="section-title">
+                <h2 data-en="Simple, Transparent Pricing" data-kh="តម្លៃសាមញ្ញ និងភាពជាក់ស្តែង">Simple, Transparent Pricing</h2>
+                <p data-en="Choose the plan that fits your needs" data-kh="ជ្រើសរើសផែនការដែលសមនឹងតម្រូវការរបស់អ្នក">Choose the plan that fits your needs</p>
+            </div>
+            <div class="pricing-grid">
+                <div class="pricing-card">
+                    <h3 data-en="Starter" data-kh="អ្នកចាប់ផ្តើម">Starter</h3>
+                    <div class="price">$19<span data-en="/month" data-kh="/ខែ">/month</span></div>
+                    <ul class="pricing-features">
+                        <li data-en="10 AI-generated posts/month" data-kh="ប្រកាសដែលបង្កើតដោយ AI ១០ ក្នុងមួយខែ">10 AI-generated posts/month</li>
+                        <li data-en="Basic scheduling" data-kh="ការកំណត់ពេលវេលាមូលដ្ឋាន">Basic scheduling</li>
+                        <li data-en="1 blog connection" data-kh="ការភ្ជាប់ប្លុក ១">1 blog connection</li>
+                        <li data-en="Email support" data-kh="ការគាំទ្រតាមអ៊ីមែល">Email support</li>
+                    </ul>
+                    <a href="#" class="btn" data-en="Get Started" data-kh="ចាប់ផ្តើម">Get Started</a>
+                </div>
+                <div class="pricing-card popular">
+                    <div class="popular-badge" data-en="Popular" data-kh="ពេញនិយម">Popular</div>
+                    <h3 data-en="Professional" data-kh="វិជ្ជាជីវៈ">Professional</h3>
+                    <div class="price">$49<span data-en="/month" data-kh="/ខែ">/month</span></div>
+                    <ul class="pricing-features">
+                        <li data-en="30 AI-generated posts/month" data-kh="ប្រកាសដែលបង្កើតដោយ AI ៣០ ក្នុងមួយខែ">30 AI-generated posts/month</li>
+                        <li data-en="Advanced scheduling" data-kh="ការកំណត់ពេលវេលាកម្រិតខ្ពស់">Advanced scheduling</li>
+                        <li data-en="3 blog connections" data-kh="ការភ្ជាប់ប្លុក ៣">3 blog connections</li>
+                        <li data-en="Priority support" data-kh="ការគាំទ្រអាទិភាព">Priority support</li>
+                        <li data-en="Performance analytics" data-kh="ការវិភាគប្រសិទ្ធភាព">Performance analytics</li>
+                    </ul>
+                    <a href="#" class="btn" data-en="Get Started" data-kh="ចាប់ផ្តើម">Get Started</a>
+                </div>
+                <div class="pricing-card">
+                    <h3 data-en="Enterprise" data-kh="សហគ្រាស">Enterprise</h3>
+                    <div class="price">$99<span data-en="/month" data-kh="/ខែ">/month</span></div>
+                    <ul class="pricing-features">
+                        <li data-en="Unlimited AI-generated posts" data-kh="ប្រកាសដែលបង្កើតដោយ AI មិនដាច់ខាត">Unlimited AI-generated posts</li>
+                        <li data-en="Smart scheduling" data-kh="ការកំណត់ពេលវេលាឆ្លាត">Smart scheduling</li>
+                        <li data-en="Unlimited blog connections" data-kh="ការភ្ជាប់ប្លុកគ្មានដែនកំណត់">Unlimited blog connections</li>
+                        <li data-en="24/7 VIP support" data-kh="ការគាំទ្រ VIP 24/7">24/7 VIP support</li>
+                        <li data-en="Advanced analytics" data-kh="ការវិភាគកម្រិតខ្ពស់">Advanced analytics</li>
+                        <li data-en="Multi-user access" data-kh="ការចូលប្រើពហុអ្នកប្រើ">Multi-user access</li>
+                    </ul>
+                    <a href="#" class="btn" data-en="Get Started" data-kh="ចាប់ផ្តើម">Get Started</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta">
+        <div class="container">
+            <h2 data-en="Ready to Transform Your Blogging?" data-kh="ត្រៀមខ្លួនដើម្បីផ្លាស់ប្តូរការសរសេរប្លុករបស់អ្នកហើយឬនៅ?">Ready to Transform Your Blogging?</h2>
+            <p data-en="Join thousands of bloggers who are saving time and growing their audience with BlogAuto." data-kh="ចូលរួមជាមួយអ្នកសរសេរប្លុករាប់ពាន់នាក់ដែលកំពុងសន្សំពេលវេលា និងពង្រីកទស្សនិកជនរបស់ពួកគេជាមួយ BlogAuto។">Join thousands of bloggers who are saving time and growing their audience with BlogAuto.</p>
+            <a href="#pricing" class="btn" data-en="Start Your Free Trial" data-kh="ចាប់ផ្តើមការសាកល្បងដោយឥតគិតថ្លៃ">Start Your Free Trial</a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer id="contact">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-about">
+                    <div class="footer-logo">
+                        <img src="https://cdn-icons-png.flaticon.com/512/15559/15559222.png" alt="Blog Automation Logo">
+                        <span class="footer-logo-text">BlogAuto</span>
+                    </div>
+                    <p data-en="The ultimate tool for automating your blogging workflow and growing your online presence." data-kh="ឧបករណ៍ដ៏អស្ចារ្យសម្រាប់ស្វ័យប្រវត្តិកម្មលំហូរការងារប្លុករបស់អ្នក និងពង្រីកវត្តមានអនឡាញរបស់អ្នក។">The ultimate tool for automating your blogging workflow and growing your online presence.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+                <div class="footer-links">
+                    <h3 data-en="Quick Links" data-kh="តំណភ្ជាប់រហ័ស">Quick Links</h3>
+                    <ul>
+                        <li><a href="#features" data-en="Features" data-kh="លក្ខណៈពិសេស">Features</a></li>
+                        <li><a href="#how-it-works" data-en="How It Works" data-kh="របៀបដំណើរការ">How It Works</a></li>
+                        <li><a href="#pricing" data-en="Pricing" data-kh="តម្លៃ">Pricing</a></li>
+                        <li><a href="#testimonials" data-en="Testimonials" data-kh="សាកល្បង">Testimonials</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h3 data-en="Resources" data-kh="ធនធាន">Resources</h3>
+                    <ul>
+                        <li><a href="#" data-en="Blog" data-kh="ប្លុក">Blog</a></li>
+                        <li><a href="#" data-en="Documentation" data-kh="ឯកសារ">Documentation</a></li>
+                        <li><a href="#" data-en="Help Center" data-kh="មជ្ឈមណ្ឌលជំនួយ">Help Center</a></li>
+                        <li><a href="#" data-en="API Status" data-kh="ស្ថានភាព API">API Status</a></li>
+                    </ul>
+                </div>
+                <div class="footer-contact">
+                    <h3 data-en="Contact Us" data-kh="ទំនាក់ទំនងយើងខ្ញុំ">Contact Us</h3>
+                    <p><i class="fas fa-envelope"></i> <a href="mailto:info@blogauto.com">info@blogauto.com</a></p>
+                    <p><i class="fas fa-phone"></i> <a href="tel:+85512345678">+855 12 345 678</a></p>
+                    <p><i class="fas fa-map-marker-alt"></i> <span data-en="Phnom Penh, Cambodia" data-kh="ភ្នំពេញ កម្ពុជា">Phnom Penh, Cambodia</span></p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p class="english-credit">2025 - All rights reserved. Provide by Mr. Phekdey PHORN</p>
+                <p class="khmer-credit" style="display: none;">2025 - រក្សារ​សិទ្ធិ​គ្រប់​យ៉ាង ដោយលោក ផន ភក្ដី។</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Mobile Menu Toggle
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const mainNav = document.getElementById('main-nav');
+
+        mobileMenuBtn.addEventListener('click', () => {
+            mainNav.classList.toggle('active');
+        });
+
+        // Smooth Scrolling for Anchor Links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // Close mobile menu if open
+                if (mainNav.classList.contains('active')) {
+                    mainNav.classList.remove('active');
+                }
+
+                const targetId = this.getAttribute('href');
+                const targetElement = document.querySelector(targetId);
+                
+                if (targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 80,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+
+        // Back to Top Button
+        const backToTopBtn = document.getElementById('back-to-top');
+
+        window.addEventListener('scroll', () => {
+            if (window.pageYOffset > 300) {
+                backToTopBtn.classList.add('visible');
+            } else {
+                backToTopBtn.classList.remove('visible');
+            }
+        });
+
+        backToTopBtn.addEventListener('click', () => {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+
+        // Language Toggle
+        const languageToggle = document.getElementById('language-toggle');
+        const body = document.body;
+        const englishElements = document.querySelectorAll('.english-credit, .en');
+        const khmerElements = document.querySelectorAll('.khmer-credit, .kh');
+        const navLinks = document.querySelectorAll('.nav-link');
+
+        languageToggle.addEventListener('change', function() {
+            if (this.checked) {
+                // Switch to Khmer
+                body.classList.remove('english');
+                body.classList.add('khmer');
+                
+                // Toggle credit visibility
+                document.querySelectorAll('.english-credit').forEach(el => el.style.display = 'none');
+                document.querySelectorAll('.khmer-credit').forEach(el => el.style.display = 'block');
+                
+                // Update all elements with data attributes
+                document.querySelectorAll('[data-kh]').forEach(element => {
+                    if (element.hasAttribute('data-kh')) {
+                        element.textContent = element.getAttribute('data-kh');
+                    }
+                });
+            } else {
+                // Switch to English
+                body.classList.remove('khmer');
+                body.classList.add('english');
+                
+                // Toggle credit visibility
+                document.querySelectorAll('.english-credit').forEach(el => el.style.display = 'block');
+                document.querySelectorAll('.khmer-credit').forEach(el => el.style.display = 'none');
+                
+                // Update all elements with data attributes
+                document.querySelectorAll('[data-en]').forEach(element => {
+                    if (element.hasAttribute('data-en')) {
+                        element.textContent = element.getAttribute('data-en');
+                    }
+                });
+            }
+        });
+
+        // Initialize all elements to English
+        document.querySelectorAll('[data-en]').forEach(element => {
+            if (element.hasAttribute('data-en') && !element.hasAttribute('data-kh-initialized')) {
+                element.textContent = element.getAttribute('data-en');
+                element.setAttribute('data-kh-initialized', 'true');
+            }
+        });
+    </script>
+</body>
+</html>
